@@ -2,6 +2,8 @@
 # Aguardando Provisionamento do Mariadb
 echo " -- Aguardando Banco de Dados ..."
 sleep 30
+# Ajustando Memoria do PHP
+echo "memory_limit = ${PHP_MEMORY}M" >> /etc/php.ini
 # Instalando Moodle
 install=$(ls /var/www/html/moodle/config.php | wc -l)
 if [ $install -eq 1 ]; then

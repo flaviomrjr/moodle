@@ -25,6 +25,7 @@ services:
   moodle:
     image: flaviomrjr/moodle:latest
     environment:
+      PHP_MEMORY: "1024"
       MOODLE_URL: http://moodle.yourdomain.com
       MOODLE_MARIADB_HOST: mariadb
       MOODLE_MARIADB_BD: moodle

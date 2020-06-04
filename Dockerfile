@@ -34,6 +34,7 @@ chown -R apache:apache /var/www/moodledata && \
 chmod -R 755 /var/www/moodledata
 
 # Definindo environments
+ENV PHP_MEMORY 512
 ENV MOODLE_URL https://moodle.yourdomain.com
 ENV MOODLE_MARIADB_HOST mariadb
 ENV MOODLE_MARIADB_BD moodle
