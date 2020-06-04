@@ -31,6 +31,6 @@ Vagrant.configure("2") do |config|
       #RUN ANSIBLE PLAYBOOK
       moodle.vm.provision "shell",
          inline: "ansible-playbook /vagrant/docker-moodle.yml \
-         -e 'host=localhost env=dev user=admin pass=MoodleAdmin mail=moodle@yourdomain.com url=moodle.yourdomain.com dbport=3306' -t deploy"
+         -e 'host=localhost env=dev user=admin pass=MoodleAdmin mail=moodle@yourdomain.com url=moodle.yourdomain.com dbport=3306 phpmemory=512' -t deploy"
    end  
 end

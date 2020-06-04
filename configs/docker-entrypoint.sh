@@ -3,7 +3,7 @@
 echo " -- Aguardando Banco de Dados ..."
 sleep 30
 # Ajustando Memoria do PHP
-echo "memory_limit = ${PHP_MEMORY}M" >> /etc/php.ini
+sed -i "s/512/${PHP_MEMORY}/g" /etc/php.ini
 # Instalando Moodle
 install=$(ls /var/www/html/moodle/config.php | wc -l)
 if [ $install -eq 1 ]; then
