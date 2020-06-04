@@ -1,0 +1,45 @@
+version: '3.7'
+
+networks:
+  moodle:
+
+volumes:
+  mysql_data: {}
+  moodle_app: {}
+  moodle_data: {}
+
+services: 
+  mariadb:
+    image: mariadb
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: moodle
+      MYSQL_USER: moodle
+      MYSQL_PASSWORD: moodle
+      MYSQL_DATABASE: moodle
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - moodle
+  
+  moodle:
+    image: flaviomrjr/moodle:latest
+    environment:
+      MOODLE_URL: http://moodle.yourdomain.com
+      MOODLE_MARIADB_HOST: mariadb
+      MOODLE_MARIADB_BD: moodle
+      MOODLE_MARIADB_USER: moodle
+      MOODLE_MARIADB_PASS: moodle
+      MOODLE_USER: admin
+      MOODLE_USER_PASS: MoodleAdmin
+      MOODLE_USER_EMAIL: moodle@yourdomain.com
+      MOODLE_SKIP_INSTALL: "no"
+    ports:
+      - 80:80
+    volumes:
+      - moodle_app:/var/www/html/moodle
+      - moodle_data:/var/www/moodledata
+    networks:
+      - moodle
+    depends_on:
+      - mariadb
