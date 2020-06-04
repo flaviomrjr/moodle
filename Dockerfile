@@ -19,19 +19,11 @@ localedef -i pt_BR -f UTF-8 pt_BR.UTF-8; \
 localedef -i en_AU -f UTF-8 en_AU.UTF-8
 
 # Baixando aplicacao e criando diretorios de instalacao
-RUN wget https://download.moodle.org/download.php/direct/stable38/moodle-latest-38.tgz && \
-tar xf moodle-latest-38.tgz -C /var/www/html/ && \
-chown -R root:root /var/www/html/moodle/ && \
-chmod -R 775 /var/www/html/moodle/
+RUN wget https://download.moodle.org/download.php/direct/stable38/moodle-latest-38.tgz
 
 # Configurando crontab
 RUN yum -y install cronie && \
 echo "* * * * * /usr/bin/php /var/www/html/moodle/admin/cli/cron.php >/dev/null" >> /var/spool/cron/apache
-
-# Criando diretorio de dados
-RUN mkdir /var/www/moodledata && \
-chown -R apache:apache /var/www/moodledata && \
-chmod -R 755 /var/www/moodledata
 
 # Definindo environments
 ENV PHP_MEMORY 256
