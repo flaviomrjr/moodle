@@ -23,7 +23,7 @@ RUN wget https://download.moodle.org/download.php/direct/stable38/moodle-latest-
 
 # Configurando crontab
 RUN yum -y install cronie && \
-echo "* * * * * /usr/bin/php /var/www/html/moodle/admin/cli/cron.php >/dev/null" >> /var/spool/cron/apache
+echo "* * * * * /usr/bin/php /var/www/html/moodle/admin/cli/cron.php >/dev/null" >> /var/spool/cron/root
 
 # Definindo environments
 ENV PHP_MEMORY 256
