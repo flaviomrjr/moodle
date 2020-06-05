@@ -42,7 +42,10 @@ else
 	fi
 fi
 
-# Iniciando Apache
-echo " -- Iniciando o Apache - OK ..."
+# Removendo httpd temp files
 rm -rf /run/httpd/* /tmp/httpd*
-exec /usr/sbin/apachectl -DFOREGROUND
+
+# Iniciando Supervisord + Apache + Crond
+echo " -- Configurando crond jobs ..."
+echo " -- Iniciando o Apache ..."
+exec /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf

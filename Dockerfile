@@ -22,8 +22,12 @@ localedef -i en_AU -f UTF-8 en_AU.UTF-8
 RUN wget https://download.moodle.org/download.php/direct/stable38/moodle-latest-38.tgz
 
 # Configurando crontab
-RUN yum -y install cronie && \
-echo "* * * * * /usr/bin/php /var/www/html/moodle/admin/cli/cron.php >/dev/null" >> /var/spool/cron/root
+COPY ./configs/moodle-cron /etc/cron.d/moodle-cron
+RUN yum -y install crontabs supervisor && \
+cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime && \
+sed -i -e '/pam_loginuid.so/s/^/#/' /etc/pam.d/crond && \
+chmod 0644 /etc/cron.d/moodle-cron && \
+crontab /etc/cron.d/moodle-cron
 
 # Definindo environments
 ENV PHP_MEMORY 256
@@ -45,6 +49,9 @@ COPY ./configs/php.ini /etc/php.ini
 
 # Inserindo arquivo .htaccess
 COPY ./configs/htaccess /var/www/html/moodle/.htaccess
+
+# Inserindo supervisord.conf
+COPY ./configs/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Configurando entrypoint
 ADD ./configs/docker-entrypoint.sh /usr/local/bin/
