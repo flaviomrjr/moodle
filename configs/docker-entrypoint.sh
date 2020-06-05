@@ -17,6 +17,10 @@ else
                 chown -R root:root /var/www/html/moodle/ && \
                 chmod -R 777 /var/www/html/moodle/
 
+		# Criando diretorio moodel tmp
+                mkdir -p /tmp/moodle && \
+                chmod -R 777 /tmp/moodle
+		
                 # Criando diretorio moodledata
                 mkdir /var/www/html/moodledata && \
                 chown -R apache:apache /var/www/html/moodledata && \
