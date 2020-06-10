@@ -166,13 +166,21 @@ Quando você inicia a imagem do Moodle, você pode ajustar a configuração da i
 **Configuração do Usuário, Site e Database:**
 
 `MOODLE_USER:` Usuário Moodle. Padrão: **admin**
+
 `MOODLE_USER_PASS:` Senha do usuário Moodle. Padrão: **MoodleAdmin**
+
 `MOODLE_USER_MAIL:` E-mail do usuário Moodle. Padrão: **moodle@yourdomain.com**
+
 `MOODLE_URL:` URL de acesso ao Moodle. Padrão: **http://moodle.yourdomain.com**
+
 `MOODLE_SKIP_INSTALL:` Não executa a instalação inicial do Moodle. Padrão: **no**
+
 `MOODLE_MARIADB_HOST:` Define o servidor de banco de dados. Padrão: **mariadb**
+
 `MOODLE_MARIADB_BD:` Define o banco de dados. Padrão: **moodle**
+
 `MOODLE_MARIADB_USER:` Define o usuário de acesso ao banco de dados. Padrão: **moodle**
+
 `MOODLE_MARIADB_PASS:` Define a senha do usuário de acesso ao banco de dados. Padrão: **moodle**
 
 **Configuração do PHP:**
@@ -182,8 +190,11 @@ Quando você inicia a imagem do Moodle, você pode ajustar a configuração da i
 **Configurações do Banco de Dados:**
 
 `MYSQL_ROOT_PASSWORD:` Define a senha do usuário root do mariadb. Padrão: **moodle**
+
 `MYSQL_USER:` Define o usuário do banco de dados. Padrão: **moodle**
+
 `MYSQL_PASSWORD:` Define a senha do usuário do banco de dados. Padrão: **moodle**
+
 `MYSQL_DATABASE:` Define o nome do banco de dados. Padrão: **moodle**
 
 Para mais variáveis de ambiente, consulto o repositório oficial do Mariadb: https://hub.docker.com/_/mariadb  
@@ -281,9 +292,7 @@ Siga os passos a seguir, para montar seu ambiente de CI/CD.
   - _**OBS**_: A pipeline está configurada para aguardar até 30 minutos no processo de aprovação.
 
 **PIPELINE**
-
  ![IMAGEM GIT](https://github.com/flaviomrjr/moodle/blob/master/pipeline-moodle.png?raw=true)
-
  Essa imagem exibe a pipeline com o processo de deploy em Dev e depois em Produção. O Jenkinsfile do repositório está configurado para fazer deploy em Dev, Cert e Prod. Caso queira remover Cert, remova os passos de Cert no Jenkinsfile.
 
 Vagrant
