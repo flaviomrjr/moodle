@@ -1,0 +1,95 @@
+- name: Removendo Old Container Mariadb
+  docker_container:
+    name: "mariadb-{{ env }}"
+    state: absent
+  tags:
+  - update
+
+- name: Removendo Old Container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: absent
+  tags:
+  - update
+
+- name: Criando Container Mariadb
+  docker_container:
+    name: "mariadb-{{ env }}"
+    image: mariadb
+    env:
+      MYSQL_USER="moodle-{{ env }}"
+      MYSQL_DATABASE="moodle-{{ env }}"
+      MYSQL_ROOT_PASSWORD="password"
+      MYSQL_PASSWORD="password"
+    ports:
+      - "{{ dbport }}:3306"
+    volumes:
+      - "/opt/moodle-{{ env }}/mariadb:/var/lib/mysql"
+    state: started
+    networks:
+      - name: "moodle-{{ env }}"
+    purge_networks: yes
+    networks_cli_compatible: yes
+  tags:
+  - update
+  
+- name: Criando Container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    image: flaviomrjr/moodle:latest
+    env:
+      PHP_MEMORY="{{ phpmemory }}"
+      MOODLE_URL="https://{{ url }}"
+      MOODLE_MARIADB_HOST="mariadb-{{ env }}"
+      MOODLE_MARIADB_BD="moodle-{{ env }}"
+      MOODLE_MARIADB_USER="moodle-{{ env }}"
+      MOODLE_MARIADB_PASS="password"
+      PHP_MEMORY_LIMIT="{{ phpmemory }}"
+      MOODLE_USER="{{ user }}"
+      MOODLE_USER_PASS="{{ pass }}"
+      MOODLE_USER_EMAIL="{{ mail }}"
+      MOODLE_SKIP_INSTALL="no"
+    volumes:
+      - "/opt/moodle-{{ env }}/app:/var/www/html"
+      - "/opt/moodle-{{ env }}/logs:/var/log/httpd"
+      - "/opt/moodle-{{ env }}/tmp:/tmp"
+    links:
+      - "mariadb-{{ env }}"
+    state: started
+    output_logs: yes
+    networks:
+      - name: "moodle-{{ env }}"
+    purge_networks: yes
+    networks_cli_compatible: yes
+  tags:
+  - update 
+
+- name: Verificando o IP do container
+  command: "docker exec moodle-{{ env }} hostname -i"
+  register: ipcontainer
+  tags:
+  - update
+
+- name: Criando VirtualHost CentOS
+  template:
+    src: virtualhost.conf
+    dest: "/etc/httpd/conf.d/moodle-{{ env }}.conf"
+  notify: reload_httpd
+  when: ansible_os_family == "RedHat"
+  tags:
+  - update
+
+- name: Criando VirtualHost Ubuntu
+  template:
+    src: virtualhost.conf
+    dest: "/etc/apache2/sites-available/moodle-{{ env }}.conf"
+  when: ansible_os_family == "Debian"
+  tags:
+  - update
+
+- name: Ativando virtualhost Ubuntu
+  command: "a2ensite moodle-{{ env }}.conf"
+  notify: reload_apache2
+  when: ansible_os_family == "Debian"
+  tags:
+  - update

@@ -1,0 +1,13 @@
+---
+# tasks file for docker-moodle
+- include: puppet.yml
+- include: prerequisitos_centos.yml
+  when: ansible_os_family == "RedHat"
+- include: prerequisitos_ubuntu.yml
+  when: ansible_os_family == "Debian"
+- include: deploy.yml
+- include: destroy.yml
+- include: backup.yml
+- include: restore.yml
+- include: clone.yml
+- include: update.yml

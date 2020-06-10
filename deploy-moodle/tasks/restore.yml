@@ -1,0 +1,60 @@
+- name: Parando container Mariadb
+  docker_container:
+    name: "mariadb-{{ env }}"
+    state: stopped
+  tags:
+  - restore
+
+- name: Parando container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: stopped
+  tags:
+  - restore
+
+- name: Removendo diretorio
+  file:
+    path: "/opt/moodle-{{ env }}"
+    state: absent
+  tags:
+  - restore
+
+- name: Criando diretorio
+  file:
+    path: "/opt/moodle-{{ env }}"
+    owner: root
+    group: docker
+    mode: '0775'
+    state: directory
+  tags:
+  - restore
+
+- name: Restaurando Aplicacao
+  unarchive:
+    src: "/backup/moodle-{{ env }}/bkp_{{ bkpdate }}/app_{{ bkpdate }}.tar.bz2"
+    dest: "/opt/moodle-{{ env }}"
+    remote_src: yes
+  tags:
+  - restore
+
+- name: Restaurando o Banco de Dados
+  unarchive:
+    src: "/backup/moodle-{{ env }}/bkp_{{ bkpdate }}/mariadb_{{ bkpdate }}.tar.bz2"
+    dest: "/opt/moodle-{{ env }}"
+    remote_src: yes
+  tags:
+  - restore
+
+- name: Iniciando container Mariadb
+  docker_container:
+    name: "mariadb-{{ env }}"
+    state: started
+  tags:
+  - restore
+
+- name: Iniciando container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: started
+  tags:
+  - restore

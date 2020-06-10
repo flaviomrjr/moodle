@@ -1,0 +1,78 @@
+- name: Instalando Pacotes Necessarios CentOS
+  yum:
+    name: ["python-firewall","net-tools","epel-release","python-docker-py","unzip","bzip2","httpd","vim","mod_ssl"]
+    state: present
+  tags:
+  - prereq
+
+- name: Copiando Certificado
+  copy:
+    src: "ssl"
+    dest: /opt
+  tags:
+  - prereq
+
+- name: Iniciando HTTPD
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+  tags:
+  - prereq
+
+- name: Criando Network Cadvisor Monitor
+  docker_network:
+    name: monitor
+  tags:
+  - prereq
+
+- name: Criando Container Cadvisor
+  docker_container:
+    name: cadvisor
+    image: google/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro  
+    state: started
+    networks: 
+      - name: monitor
+    purge_networks: yes
+    networks_cli_compatible: yes
+    restart_policy: always
+  tags:
+  - prereq
+
+#THE NEXT TASKS DOWS NOT WORK ON AWS EC2 
+#- name: Liberando HTTPS
+#  firewalld:
+#    service: https
+#    permanent: true
+#    state: enabled
+#  tags:
+#  - prereq  
+
+#- name: Liberando HTTP
+#  firewalld:
+#    service: http
+#    permanent: true
+#    state: enabled
+#  tags:
+#  - prereq
+
+#- name: Liberando Node Exporter Port
+#  firewalld:
+#    port: 9100/tcp
+#    permanent: true
+#    state: enabled
+#  tags:
+#  - prereq
+
+#- name: Liberando Docker Exporter Port
+#  firewalld:
+#    port: 9323/tcp
+#    permanent: true
+#    state: enabled
+#  tags:
+#  - prereq

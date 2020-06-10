@@ -1,0 +1,59 @@
+- defaultTab: nodes
+  description: "Job utilizado para atualizar um ambiente Moodle.  \n\n## Parametros\
+    \ utilizados:  \n\nVocê deve definir os parametros a seguir para realizar o deploy\
+    \ da aplicação.  \nUtilize todos os nomes com letras minusculas, nao use caracteres\
+    \ especiais e  \nnão use acentos. \n\n**env:**  \n\nSerá utilizado para definir\
+    \ o ambiente que será atualizado: **Ex: telefonica-dev**\n\n**dbport:**\n\nSerá\
+    \ utilizado para definir a porta de acesso ao Mariadb: **Ex: 3306**\n\n**url:**\n\
+    \nSerá utilizado para definir a URL da aplicação: **Ex: educa.telefonicaed.com.br**"
+  executionEnabled: true
+  id: ddbc0629-20ac-4691-b387-728c81428b58
+  loglevel: INFO
+  name: UPDATE
+  nodeFilterEditable: false
+  nodefilters:
+    dispatch:
+      excludePrecedence: true
+      keepgoing: false
+      rankOrder: ascending
+      successOnEmptyNodeFilter: false
+      threadcount: '1'
+    filter: devops
+  nodesSelectedByDefault: true
+  notification:
+    onfailure:
+      plugin:
+        configuration:
+          slack_channel: '#rundeck'
+          webhook_base_url: https://hooks.slack.com/services
+          webhook_token: TGEHEHN3E/BNUTG45M0/1DrTkrMPUz9w1EZ1sA8ty8qm
+        type: SlackNotification
+    onsuccess:
+      plugin:
+        configuration:
+          slack_channel: '#rundeck'
+          webhook_base_url: https://hooks.slack.com/services
+          webhook_token: TGEHEHN3E/BNUTG45M0/1DrTkrMPUz9w1EZ1sA8ty8qm
+        type: SlackNotification
+  notifyAvgDurationThreshold: null
+  options:
+  - description: Define host para Update
+    name: host
+    required: true
+  - description: Variavel irá definir o ambiente da aplicação
+    name: env
+    required: true
+  - description: Responsavel em definir em qual porta o mysql irá responder
+    name: dbport
+    required: true
+  - description: Responsavel por definir a URL da aplicação
+    name: url
+    required: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: ansible-playbook /etc/ansible/playbooks/docker-moodle.yml -e "host=${option.host}
+        env=${option.env} url=${option.url} dbport=${option.dbport}" -t backup,update
+    keepgoing: false
+    strategy: node-first
+  uuid: ddbc0629-20ac-4691-b387-728c81428b58

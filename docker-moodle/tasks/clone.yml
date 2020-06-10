@@ -1,0 +1,104 @@
+- name: Criando Diretorio de Clone
+  file:
+    path: "/moodle-clone/moodle-{{ envclone }}"
+    owner: root
+    group: root
+    mode: '0775'
+    state: directory
+  tags: ['clone','backup-remote']
+
+- name: Realizando Backup da Aplicacao Clonada
+  archive:
+    path: 
+    - "/opt/moodle-{{ envclone }}/app"
+    dest: "/moodle-clone/moodle-{{ envclone }}/app_{{ envclone }}.tar.bz2"
+    format: bz2
+  tags: ['clone','backup-remote']
+
+- name: Realizando Backup do Bando de Dados Clonado
+  shell: "docker exec mariadb-{{ envclone }} /usr/bin/mysqldump -u root --password=password --add-drop-database moodle-{{ envclone }} > /moodle-clone/moodle-{{ envclone }}/moodle-{{ envclone }}.sql"
+  tags: ['clone','backup-remote']
+
+- name: Parando container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: stopped
+  tags: ['clone','clone-remote']
+
+- name: Removendo diretorio
+  file:
+    path: "/opt/moodle-{{ env }}/app/"
+    state: absent
+  tags: ['clone','clone-remote']
+
+- name: Restaurando Aplicacao Clonada
+  unarchive:
+    src: "/moodle-clone/moodle-{{ envclone }}/app_{{ envclone }}.tar.bz2"
+    dest: "/opt/moodle-{{ env }}"
+    remote_src: yes
+  tags: ['clone','clone-remote']
+
+- name: Garantindo arquivo config.php
+  template:
+    src: config.php
+    dest: "/opt/moodle-{{ env }}/app/moodle/"
+  tags: ['clone','clone-remote']
+
+- name: Restaurando Bando de Dados Clonado
+  shell: "docker exec -i mariadb-{{ env }} /usr/bin/mysql -u root --password=password moodle-{{ env }} < /moodle-clone/moodle-{{ envclone }}/moodle-{{ envclone }}.sql"
+  tags: ['clone','clone-remote']
+
+- name: Iniciando Container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    env:
+      MOODLE_MARIADB_HOST="mariadb-{{ env }}"
+      MOODLE_MARIADB_BD="moodle-{{ env }}"
+      MOODLE_MARIADB_USER="moodle-{{ env }}"
+      MOODLE_MARIADB_PASS="password"
+      MOODLE_SKIP_INSTALL="yes"
+    volumes:
+      - "/opt/moodle-{{ env }}/app:/var/www/html"
+      - "/opt/moodle-{{ env }}/logs:/var/log/httpd"
+      - "/opt/moodle-{{ env }}/tmp:/tmp"
+    links:
+      - "mariadb-{{ env }}"
+    state: started
+    output_logs: yes
+    networks:
+      - name: "moodle-{{ env }}"
+    purge_networks: yes
+    networks_cli_compatible: yes
+  tags: ['clone','clone-remote']
+
+- name: Verificando o IP do container
+  command: "docker exec moodle-{{ env }} hostname -i"
+  register: ipcontainer
+  tags: ['clone','clone-remote']
+
+- name: Criando VirtualHost CentOS
+  template:
+    src: virtualhost.conf
+    dest: "/etc/httpd/conf.d/moodle-{{ env }}.conf"
+  notify: reload_httpd
+  when: ansible_os_family == "RedHat"
+  tags: ['clone','clone-remote']
+
+- name: Criando VirtualHost Ubuntu
+  template:
+    src: virtualhost.conf
+    dest: "/etc/apache2/sites-available/moodle-{{ env }}.conf"
+  when: ansible_os_family == "Debian"
+  tags: ['clone','clone-remote']
+
+- name: Ativando virtualhost Ubuntu
+  command: "a2ensite moodle-{{ env }}.conf"
+  notify: reload_apache2
+  when: ansible_os_family == "Debian"
+  tags: ['clone','clone-remote']
+
+- name: Excluindo Arquivos de Clone
+  file:
+    path: "/moodle-clone/moodle-{{ envclone }}"
+    state: absent
+  tags: ['clone','clone-remote']

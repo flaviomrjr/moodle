@@ -1,0 +1,61 @@
+- defaultTab: nodes
+  description: "Job utilizado para restaurar ambiente Moodle.  \n\n## Parametros utilizados:\
+    \  \n\nVocê deve definir os parametros a seguir para realizar o deploy da aplicaç\
+    ão.  \nUtilize todos os nomes com letras minusculas, nao use caracteres especiais\
+    \ e  \nnão use acentos. \n\n**env:**  \n\nSerá utilizado para definir o ambiente\
+    \ restaurado: **Ex: dev**\n\n**date**\n\nSerá utilizado para definir a data do\
+    \ backup restaurado\n\n**url:**\n\nSerá utilizado para definir a URL da aplicaç\
+    ão: **Ex: educa.telefonicaed.com.br**"
+  executionEnabled: true
+  id: 2ac5d44c-73ef-4c89-bdc0-3b42a8dc62e9
+  loglevel: INFO
+  name: RESTORE
+  nodeFilterEditable: false
+  nodefilters:
+    dispatch:
+      excludePrecedence: true
+      keepgoing: false
+      rankOrder: ascending
+      successOnEmptyNodeFilter: false
+      threadcount: '1'
+    filter: devops
+  nodesSelectedByDefault: true
+  notification:
+    onfailure:
+      plugin:
+        configuration:
+          slack_channel: '#rundeck'
+          webhook_base_url: https://hooks.slack.com/services
+          webhook_token: TGEHEHN3E/BNUTG45M0/1DrTkrMPUz9w1EZ1sA8ty8qm
+        type: SlackNotification
+    onsuccess:
+      plugin:
+        configuration:
+          slack_channel: '#rundeck'
+          webhook_base_url: https://hooks.slack.com/services
+          webhook_token: TGEHEHN3E/BNUTG45M0/1DrTkrMPUz9w1EZ1sA8ty8qm
+        type: SlackNotification
+  notifyAvgDurationThreshold: null
+  options:
+  - description: Define o host para restore
+    name: host
+    required: true
+  - description: Define o ambiente
+    name: env
+    required: true
+  - dateFormat: YYYY-MM-DD
+    description: Define a data do backup
+    isDate: true
+    name: date
+    required: true
+  - description: Irá definir a URL de acesso a aplicação
+    name: url
+    required: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - exec: ansible-playbook /etc/ansible/playbooks/docker-moodle.yml -e "host=${option.host}
+        env=${option.env} bkpdate=${option.date} url=${option.url}" -t restore
+    keepgoing: false
+    strategy: node-first
+  uuid: 2ac5d44c-73ef-4c89-bdc0-3b42a8dc62e9

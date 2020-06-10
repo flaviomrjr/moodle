@@ -1,0 +1,5 @@
+---
+# tasks file for deploy-moodle
+- include: backup.yml
+- include: restore.yml
+- include: deploy.yml

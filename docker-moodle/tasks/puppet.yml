@@ -1,0 +1,12 @@
+- name: Adicionando New Host ao Manifest docker.pp
+  blockinfile:
+    path: /etc/puppetlabs/code/environments/production/manifests/docker.pp
+    state: present
+    block: |
+      node "{{ hostname }}.yourdomain.local" {
+       
+              include docker
+     
+      }
+  tags:
+  - puppet

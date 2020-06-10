@@ -1,0 +1,13 @@
+---
+# handlers file for docker-moodle
+- name: reload_httpd
+  systemd:
+    name: httpd
+    state: reloaded
+  tags: [ deploy, restore, clone ]
+
+- name: reload_apache2
+  systemd:
+    name: apache2
+    state: reloaded
+  tags: [ deploy, restore, clone ]

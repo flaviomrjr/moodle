@@ -1,0 +1,57 @@
+- name: Stopping Mariadb container
+  docker_container:
+    name: "mariadb-{{ env }}"
+    state: stopped
+  tags:
+  - destroy
+
+- name: Removendo ambiente anterior Mariadb
+  docker_container:
+    name: "mariadb-{{ env }}"
+    state: absent
+  tags:
+  - destroy
+
+- name: Stopping Moodle container
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: stopped
+  tags:
+  - destroy
+
+- name: Removendo ambiente anterior Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: absent
+  tags:
+  - destroy
+
+- name: Removendo volumes
+  file:
+    path: "/opt/moodle-{{ env }}" 
+    state: absent
+  tags:
+  - destroy
+
+- name: Removendo VirtualHost CentOS
+  file: 
+    path: "/etc/httpd/conf.d/moodle-{{ env }}.conf"
+    state: absent
+  when: ansible_os_family == "RedHat"
+  tags:
+  - destroy
+
+- name: Desativando virtualhost Ubuntu
+  command: "a2dissite moodle-{{ env }}.conf"
+  notify: reload_apache2
+  when: ansible_os_family == "Debian"
+  tags:
+  - destroy
+
+- name: Removendo VirtualHost Ubuntu
+  file:
+    path: "/etc/apache2/sites-available/moodle-{{ env }}.conf"
+    state: absent
+  when: ansible_os_family == "Debian"
+  tags:
+  - destroy

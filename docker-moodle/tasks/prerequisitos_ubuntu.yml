@@ -1,0 +1,57 @@
+- name: Instalando Pacotes Necessarios Ubuntu
+  yum:
+    name: ["python-docker","unzip","bzip2","apache2","vim","python3-pip","gnupg2","pass"]
+    update_cache: yes
+    state: present
+  tags:
+  - prereq
+
+- name: Copiando Certificado
+  copy:
+    src: "ssl"
+    dest: /opt
+  tags:
+  - prereq
+
+- name: Habilitando Modulos do Apache
+  command: "a2enmod {{ item }}"
+  notify: reload_apache2
+  loop:
+  - proxy
+  - rewrite
+  - proxy_http
+  - ssl
+  tags:
+  - prereq
+
+- name: Iniciando Apache2
+  systemd:
+    name: apache2
+    state: started
+    enabled: yes
+  tags:
+  - prereq
+
+- name: Criando Network Cadvisor Monitor
+  docker_network:
+    name: monitor
+  tags:
+  - prereq
+
+- name: Criando Container Cadvisor
+  docker_container:
+    name: cadvisor
+    image: google/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro  
+    state: started
+    networks: 
+      - name: monitor
+    purge_networks: yes
+    networks_cli_compatible: yes
+    restart_policy: always
+  tags:
+  - prereq

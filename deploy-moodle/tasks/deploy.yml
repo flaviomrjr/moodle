@@ -1,0 +1,40 @@
+- name: Parando container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: stopped
+  tags:
+  - deploy
+  
+- name: Realizando o Deploy da Aplicacao
+  synchronize:
+    src: "{{ lookup('env','WORKSPACE_JENKINS') }}/moodle/"
+    dest: "/opt/moodle-{{ env }}/app/moodle/"
+    delete: yes
+    owner: no
+    group: no
+    perms: no
+  tags:
+  - deploy
+  
+- name: Garantindo arquivo config.php
+  template:
+    src: config.php
+    dest: "/opt/moodle-{{ env }}/app/moodle/"
+  tags:
+  - deploy
+  
+- name: Garantindo permissao do diretorio app/moodle
+  file:
+    path: "/opt/moodle-{{ env }}/app/moodle"
+    mode: '0777'
+    recurse: yes
+    state: directory
+  tags:
+  - deploy
+
+- name: Iniciando container Moodle
+  docker_container:
+    name: "moodle-{{ env }}"
+    state: started
+  tags:
+  - deploy

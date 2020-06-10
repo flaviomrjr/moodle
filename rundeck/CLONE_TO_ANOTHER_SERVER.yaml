@@ -1,0 +1,92 @@
+- defaultTab: nodes
+  description: "Job utilizado para clonar um ambiente Moodle para outro servidor \
+    \ \n\n## Parametros utilizados:  \n\nVocê deve definir os parametros a seguir\
+    \ para realizar o deploy da aplicação.  \nUtilize todos os nomes com letras minusculas,\
+    \ nao use caracteres especiais e  \nnão use acentos. \n\n**clone:**\n\nSerá utilizado\
+    \ para definir o ambiente clonado: **Ex: telefonica-dev**\n\n**from:**\n\nSerá\
+    \ utilizado para definir de qual servidor o ambiente será clonado **Ex: 192.168.0.105**\
+    \ \n\n**to:**\n\nSerá utilizado para definir em qual servidor o ambiente será\
+    \ clonado **Ex: 192.168.0.106** \n\n**env:**  \n\nSerá utilizado para definir\
+    \ o ambiente da aplicação: **Ex: dev**\n\n**phpmemory:**\n\nSerá utilizado para\
+    \ definir a memoria da aplicação: **Ex: 1024**\n\n**dbport:**\n\nSerá utilizado\
+    \ para definir a porta de acesso ao Mariadb: **Ex: 3306**\n\n**url:**\n\nSerá\
+    \ utilizado para definir a URL da aplicação: **Ex: educa.telefonicaed.com.br**"
+  executionEnabled: true
+  id: 52a0e7d3-ca68-4f06-a6c3-b1b34ae46e5b
+  loglevel: INFO
+  name: CLONE TO ANOTHER SERVER
+  nodeFilterEditable: false
+  nodefilters:
+    dispatch:
+      excludePrecedence: true
+      keepgoing: false
+      rankOrder: ascending
+      successOnEmptyNodeFilter: false
+      threadcount: '1'
+    filter: devops
+  nodesSelectedByDefault: true
+  notification:
+    onfailure:
+      plugin:
+        configuration:
+          slack_channel: '#rundeck'
+          webhook_base_url: https://hooks.slack.com/services
+          webhook_token: TGEHEHN3E/BNUTG45M0/1DrTkrMPUz9w1EZ1sA8ty8qm
+        type: SlackNotification
+    onsuccess:
+      plugin:
+        configuration:
+          slack_channel: '#rundeck'
+          webhook_base_url: https://hooks.slack.com/services
+          webhook_token: TGEHEHN3E/BNUTG45M0/1DrTkrMPUz9w1EZ1sA8ty8qm
+        type: SlackNotification
+  notifyAvgDurationThreshold: null
+  options:
+  - description: Define o ambiente que será clonado
+    name: envclone
+    required: true
+    values:
+    - telefonica-dev
+    - telefonica-cert
+    - telefonica-prod
+    valuesListDelimiter: ','
+  - description: Definite de qual servidor será cloando o ambiente
+    name: from
+    required: true
+  - description: Definite em qual servidor o ambiente será clonado
+    name: to
+    required: true
+  - description: Variavel irá definir o ambiente da aplicação
+    name: env
+    required: true
+  - description: Define a memoria do PHP
+    name: phpmemory
+    required: true
+  - description: Responsavel em definir em qual porta o mysql irá responder
+    name: dbport
+    required: true
+  - description: Responsavel por definir a URL da aplicação
+    name: url
+    required: true
+  scheduleEnabled: true
+  sequence:
+    commands:
+    - description: Realizando o Backup da Aplicação que sera Clonada
+      exec: ansible-playbook /etc/ansible/playbooks/docker-moodle.yml -e "host=${option.from}
+        envclone=${option.envclone}" -t backup-remote
+    - description: Copiando Backup para Servidor Ansible
+      exec: scp -r ${option.from}:/moodle-clone/moodle-${option.envclone} /tmp/
+    - description: Criando diretório de clone
+      exec: ssh ${option.to} mkdir -p /moodle-clone/
+    - description: Copiando Backup do Servidor Ansible para o Servidor de aplicacao
+      exec: scp -r /tmp/moodle-${option.envclone}/ ${option.to}:/moodle-clone/moodle-${option.envclone}/
+    - description: Removendo Backup do Servidor Ansible
+      exec: rm -rf /tmp/moodle-${option.envclone}/
+    - description: Importando aplicacao no Servidor
+      exec: ansible-playbook /etc/ansible/playbooks/docker-moodle.yml -e "host=${option.to}
+        env=${option.env} envclone=${option.envclone} phpmemory=${option.phpmemory}
+        user=teste pass=Clone@2020 mail=clone@clone.com url=${option.url} dbport=${option.dbport}"
+        -t deploy,clone-remote
+    keepgoing: false
+    strategy: node-first
+  uuid: 52a0e7d3-ca68-4f06-a6c3-b1b34ae46e5b
