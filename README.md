@@ -205,7 +205,7 @@ Instalando novos pacotes de idiomas
 Por padrão, esse container é instalado em Inglês. Mesmo assim, outro pacotes podem ser adicionados utilizando a inteface de Administração. Como requerimento, para um novo idioma funcionar completamente, o arquivo locale do sistema deve ser atualizado com o idioma desejado. Os idiomas `Português Brasil` e `Espanhol Espanha` já foram configurado. Para adicionar novos locales, você deve estender a imagem adicionando novos locales:
 
 ```shell
-FROM centos/httpd
+FROM flaviomrjr/moodle:latest
 RUN localedef -i en_US -f UTF-8 en_US.UTF-8
 ```
 
