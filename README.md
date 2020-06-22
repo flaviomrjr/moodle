@@ -197,12 +197,12 @@ Quando você inicia a imagem do Moodle, você pode ajustar a configuração da i
 
 `MYSQL_DATABASE:` Define o nome do banco de dados. Padrão: **moodle**
 
-Para mais variáveis de ambiente, consulto o repositório oficial do Mariadb: https://hub.docker.com/_/mariadb  
+Para mais variáveis de ambiente, consulte o repositório oficial do Mariadb: https://hub.docker.com/_/mariadb  
 
 Instalando novos pacotes de idiomas
 -----------------------------------
 
-Por padrão, esse container é instalado em Inglês. Mesmo assim, outro pacotes podem ser adicionados utilizando a inteface de Administração. Como requerimento, para um novo idioma funcionar completamente, o arquivo locale do sistema deve ser atualizado com o idioma desejado. Os idiomas `Português Brasil` e `Espanhol Espanha` já foram configurado. Para adicionar novos locales, você deve estender a imagem adicionando novos locales:
+Por padrão, esse container é instalado em Inglês. Mesmo assim, outros pacotes podem ser adicionados utilizando a inteface de Administração. Como requerimento, para um novo idioma funcionar completamente, o arquivo locale do sistema deve ser atualizado com o idioma desejado. Os idiomas `Português Brasil` e `Espanhol Espanha` já foram configurado. Para adicionar novos locales, você deve estender a imagem adicionando novos locales:
 
 ```shell
 FROM flaviomrjr/moodle:latest
