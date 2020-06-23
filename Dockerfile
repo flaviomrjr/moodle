@@ -31,7 +31,7 @@ crontab /etc/cron.d/moodle-cron
 
 # Definindo environments
 ENV PHP_MEMORY 256
-ENV MOODLE_URL https://moodle.yourdomain.com
+ENV MOODLE_URL http://moodle.yourdomain.com
 ENV MOODLE_MARIADB_HOST mariadb
 ENV MOODLE_MARIADB_BD moodle
 ENV MOODLE_MARIADB_USER moodle
